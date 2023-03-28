@@ -1,0 +1,28 @@
+version: 0.2
+
+batch:
+  fast-fail: true
+  # build-list:
+  # build-matrix:
+  # build-graph:
+
+phases:
+  install:
+    on-failure: ABORT
+    runtime-versions:
+      nodejs: 14.21
+    commands:
+      - yarn
+  pre_build:
+    on-failure: ABORT
+    commands:
+      - aws s3 cp $BUCKET_URI/.env .
+  build:
+    on-failure: ABORT
+    commands:
+      - yarn run build
+artifacts:
+  files:
+    - dist/**/*
+  name: artifact
+  base-directory: dist
