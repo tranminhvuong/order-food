@@ -25,5 +25,5 @@ phases:
   post_build:
     on-failure: ABORT
     commands:
-      - cd dist & aws s3 cp ./ $S3_BUCKET_DESTINATION_URI --recursive
+      - aws s3 cp dist/ $S3_BUCKET_DESTINATION_URI --recursive
       - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
