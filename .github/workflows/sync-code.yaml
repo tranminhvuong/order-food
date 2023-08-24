@@ -40,13 +40,7 @@ jobs:
           git status
           echo $MESSAGE
           git commit -m "${MESSAGE}"
-
-      - name: Push to GitHub
-        uses: ad-m/github-push-action@v0.6.0
-        with:
-          github_token: ${{ secrets.SYNC_TOKEN }}
-          repository: ${{ vars.SYNC_REPO }}
-          branch: ${{ github.ref_name }}
+          git push origin ${{ github.ref_name }} -f
 
       - name: Push tag
         if: env.TAG != ''
