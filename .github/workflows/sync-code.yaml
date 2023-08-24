@@ -6,6 +6,10 @@ on:
       - ppr
       - prd
       - develop
+env:
+  MESSAGE:
+  TAG:
+
 jobs:
   sync-git:
     runs-on: self-hosted
@@ -23,8 +27,8 @@ jobs:
       - name: Change git repo
         run: |
           sudo apt-get install gawk -y
-          awk '{gsub(/Message:/, ""); NR==0 print}' customer_commit.txt >> $MESSAGE
-          awk '{gsub(/Tag:/, ""); NR==0 print}' customer_commit.txt >> $TAG
+          $MESSAGE=$(awk 'gsub(/Message:/, ""); NR==0' customer_commit.txt)
+          $TAG=$(awk 'gsub(/Tag:/, ""); NR==0' customer_commit.txt)
           rm -rf .git
           git init
           git checkout -b ${{ github.ref_name }}
