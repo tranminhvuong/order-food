@@ -12,7 +12,7 @@ env:
 
 jobs:
   sync-git:
-    runs-on: self-hosted
+    # runs-on: self-hosted
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
