@@ -46,7 +46,7 @@ jobs:
         if: env.TAG != ''
         run: |
           exist_tag=$(git tag -l | grep $TAG)
-          if [-z "$a"];
+          if [-z "$exist_tag"];
           then
             echo "Add tag: $TAG"
             git tag $TAG
