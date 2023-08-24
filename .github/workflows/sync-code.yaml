@@ -27,8 +27,8 @@ jobs:
       - name: Change git repo
         run: |
           sudo apt-get install gawk -y
-          $MESSAGE=$(awk 'gsub(/Message:/, ""); NR==0' customer_commit.txt)
-          $TAG=$(awk 'gsub(/Tag:/, ""); NR==0' customer_commit.txt)
+          echo $(awk 'gsub(/Message:/, ""); NR==0' customer_commit.txt) = $MESSAGE
+          echo $(awk 'gsub(/Tag:/, ""); NR==0' customer_commit.txt) = $TAG
           rm -rf .git
           git init
           git checkout -b ${{ github.ref_name }}
@@ -45,7 +45,7 @@ jobs:
           branch: ${{ github.ref_name }}
 
       - name: Push tag
-        if: ${{ "${{ TAG }}" != '' }}
+        if: "${{ TAG }}" != ''
         run: |
           git tag ${{ TAG }}
           git push origin ${{ TAG }}
