@@ -35,7 +35,7 @@ jobs:
           git remote add origin "${{ vars.CUSTOMER_REPO }}"
           rm -rf .github azure-pipelines.yml customer_commit.txt
           git add .
-          git commit -m ${{ MESSAGE }}
+          git commit -m ${MESSAGE}
 
       - name: Push to GitHub
         uses: ad-m/github-push-action@v0.6.0
@@ -45,7 +45,7 @@ jobs:
           branch: ${{ github.ref_name }}
 
       - name: Push tag
-        if: "${{ TAG }}" != ''
+        if: env.TAG != ''
         run: |
           git tag ${{ TAG }}
           git push origin ${{ TAG }}
