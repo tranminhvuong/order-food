@@ -45,13 +45,4 @@ jobs:
       - name: Push tag
         if: env.TAG != ''
         run: |
-          exist_tag=$(git tag -l | grep $TAG)
-          if [[-z "$exist_tag"]];
-          then
-            echo "Add tag: $TAG"
-            git tag $TAG
-            git push origin $TAG
-          else
-            echo "Tag is exist"
-          fi 
-          
+          git tag $TAG && git push origin $TAG || echo "tag $TAG already exists"
