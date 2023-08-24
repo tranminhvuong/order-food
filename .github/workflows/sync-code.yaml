@@ -37,8 +37,9 @@ jobs:
           git pull origin ${{ github.ref_name }} || echo "No branch"
           rm -rf .github azure-pipelines.yml customer_commit.txt
           git add .
+          git status
           echo $MESSAGE
-          git commit -m ${MESSAGE}
+          git commit -m "${MESSAGE}"
 
       - name: Push to GitHub
         uses: ad-m/github-push-action@v0.6.0
