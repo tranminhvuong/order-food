@@ -25,8 +25,9 @@ jobs:
       - name: Change git repo
         run: |
           sudo apt-get install gawk -y
-          echo MESSAGE=$(awk 'gsub(/Message:/, ""); NR==0' customer_commit.txt) >> $GITHUB_ENV
-          echo TAG=$(awk 'gsub(/Tag:/, ""); NR==0' customer_commit.txt) >> $GITHUB_ENV
+          MESSAGE=$(awk 'gsub(/Message:/, ""); NR==0' customer_commit.txt)
+          TAG=$(awk 'gsub(/Tag:/, ""); NR==0' customer_commit.txt)
+          echo "TAG=$TAG" >> $GITHUB_ENV
           rm -rf .git
           git init
           git config user.email "${{ vars.SYNC_MAIL }}"
