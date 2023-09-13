@@ -34,7 +34,7 @@ jobs:
           git config user.name "${{ vars.SYNC_USER }}"
           git checkout -b ${{ github.ref_name }}
           git remote add origin https://${{ secrets.SYNC_TOKEN }}@github.com/${{ vars.SYNC_REPO }}
-          git pull origin ${{ github.ref_name }} || echo "No branch"
+          git fetch origin
           rm -rf .github azure-pipelines.yml customer_commit.txt
           git add .
           git status
