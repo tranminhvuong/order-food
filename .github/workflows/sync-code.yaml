@@ -42,7 +42,8 @@ jobs:
           git add .
           git status
           echo $MESSAGE
-          git commit -m "${MESSAGE}"
+          git commit -m "${MESSAGE}"\
+          git branch -D devops
           git push origin ${{ github.ref_name }} -f
 
       - name: Push tag
