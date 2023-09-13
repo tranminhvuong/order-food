@@ -35,6 +35,8 @@ jobs:
           git checkout -b ${{ github.ref_name }}
           git remote add origin https://${{ secrets.SYNC_TOKEN }}@github.com/${{ vars.SYNC_REPO }}
           git fetch origin
+          git remote update
+          git pull origin ${{ github.ref_name }} --allow-unrelated-histories || echo "No brnach"
           rm -rf .github azure-pipelines.yml customer_commit.txt
           git add .
           git status
