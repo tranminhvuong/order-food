@@ -35,7 +35,7 @@ jobs:
           git checkout -b devops
           git remote add -f origin https://${{ secrets.SYNC_TOKEN }}@github.com/${{ vars.SYNC_REPO }}
           git fetch
-          git checkout -f origin/${{ github.ref_name }} --allow-unrelated-histories || echo "No branch"
+          git checkout -f origin/${{ github.ref_name }} || echo "No branch"
           git checkout ${{ github.ref_name }}
           rm -rf .github azure-pipelines.yml customer_commit.txt
           git pull origin/${{ github.ref_name }}
