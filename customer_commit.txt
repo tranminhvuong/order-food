@@ -1,2 +1,2 @@
-Message:Init repo and test
+Message:Commit 1
 Tag:v0.0.1
