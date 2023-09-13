@@ -32,16 +32,18 @@ jobs:
           git init
           git config user.email "${{ vars.SYNC_MAIL }}"
           git config user.name "${{ vars.SYNC_USER }}"
-          git checkout -b ${{ github.ref_name }}
-          git remote add origin https://${{ secrets.SYNC_TOKEN }}@github.com/${{ vars.SYNC_REPO }}
-          git fetch origin
-          git remote update
-          git pull origin ${{ github.ref_name }} --allow-unrelated-histories || echo "No brnach"
+          git checkout -b devops
+          git remote add -f origin https://${{ secrets.SYNC_TOKEN }}@github.com/${{ vars.SYNC_REPO }}
+          git fetch
+          git checkout -f origin/${{ github.ref_name }} --allow-unrelated-histories || echo "No branch"
+          git checkout ${{ github.ref_name }}
           rm -rf .github azure-pipelines.yml customer_commit.txt
+          git pull origin/${{ github.ref_name }}
           git add .
           git status
           echo $MESSAGE
-          git commit -m "${MESSAGE}"
+          git commit -m "${MESSAGE}"\
+          git branch -D devops
           git push origin ${{ github.ref_name }} -f
 
       - name: Push tag
