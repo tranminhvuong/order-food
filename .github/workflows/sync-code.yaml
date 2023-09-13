@@ -37,8 +37,10 @@ jobs:
           git fetch
           git checkout -f origin/${{ github.ref_name }} || echo "No branch"
           git checkout ${{ github.ref_name }}
+          echo "Debug 1"
           rm -rf .github azure-pipelines.yml customer_commit.txt
-          git pull origin/${{ github.ref_name }}
+          git pull origin ${{ github.ref_name }} 
+          echo "Debug 2"
           git add .
           git status
           echo $MESSAGE
