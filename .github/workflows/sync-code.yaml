@@ -53,7 +53,7 @@ jobs:
           git remote remove origin
           git remote add origin https://${{ secrets.SYNC_TOKEN }}@github.com/${{ vars.SYNC_REPO }}
           git push origin ${{ github.ref_name }} -f
-          git push origin ${{ steps.get_var.outputs.TAG_VER }}
+          git push origin ${{ steps.get_var.outputs.TAG_VER }} -f
 
       - name: Change commit another
         env:
