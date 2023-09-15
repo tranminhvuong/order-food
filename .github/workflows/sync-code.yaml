@@ -60,6 +60,8 @@ jobs:
           MESS: ${{ steps.get_var.outputs.MESSAGE }}
         if: ${{ env.MESS != '初回登録' }}
         run: |
+          git --version
+          git filter-repo --help
           HASH_COMM=`git log --oneline |grep 初回登録 |head -1 |awk {'print $1'}`
           COMMIT_DATE=`git log --oneline --pretty=fuller --format=%aD-%h |grep $HASH_COMM |head -1|cut -d- -f1`
           echo "---$HASH_COMM-----$COMMIT_DATE---"
@@ -75,11 +77,12 @@ jobs:
           git rebase --committer-date-is-author-date --onto newbranch oldbranch ${{ github.ref_name }}
           git branch -D newbranch oldbranch
           git gc
+          
           echo "--------- filter-repo -----------------"
-          git filter-repo -f --name-callback 'return b"${{vars.SYNC_USER}}"' --email-callback 'return b"${{vars.SYNC_EMAIL}}"'
+          git filter-repo -f --name-callback 'return b"${{vars.SYNC_USER}}"' --email-callback 'return b"${{vars.SYNC_MAIL}}"'
           git tag ${{ steps.get_var.outputs.TAG_VER }}
           git log
-          git --version
+          
           git remote add neworigin https://${{ secrets.SYNC_TOKEN }}@github.com/${{ vars.SYNC_REPO }}
           git push neworigin ${{ github.ref_name }} -f
           git push neworigin ${{ steps.get_var.outputs.TAG_VER }} -f
