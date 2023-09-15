@@ -5,6 +5,7 @@ on:
       - main
       - ppr
       - prd
+      - develop
 
 jobs:
   build:
