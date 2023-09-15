@@ -22,12 +22,12 @@ jobs:
       - name: Get variable
         id: get_var
         run: |
-          TAG_VER=$(cat customer_commit.txt.txt |grep -w Version |awk -F": " '{print $2}')
-          TAG_TITLE=$(cat customer_commit.txt.txt | grep -w Title |awk -F": " '{print $2}')
-          TAG_BODY=$(cat customer_commit.txt.txt | grep -w Body |awk -F": " '{print $2}')
-          MAIL=$(cat customer_commit.txt.txt | grep -w Email |awk -F": " '{print $2}')
-          USER=$(cat customer_commit.txt.txt | grep -w User |awk -F": " '{print $2}')
-          MESSAGE=$(cat customer_commit.txt.txt | grep -w Commit |awk -F": " '{print $2}')
+          TAG_VER=$(cat customer_commit.txt |grep -w Version |awk -F": " '{print $2}')
+          TAG_TITLE=$(cat customer_commit.txt | grep -w Title |awk -F": " '{print $2}')
+          TAG_BODY=$(cat customer_commit.txt | grep -w Body |awk -F": " '{print $2}')
+          MAIL=$(cat customer_commit.txt | grep -w Email |awk -F": " '{print $2}')
+          USER=$(cat customer_commit.txt | grep -w User |awk -F": " '{print $2}')
+          MESSAGE=$(cat customer_commit.txt | grep -w Commit |awk -F": " '{print $2}')
           echo ::set-output name=TAG_VER::$TAG_VER
           echo ::set-output name=TAG_TITLE::$TAG_TITLE
           echo ::set-output name=TAG_BODY::$TAG_BODY
