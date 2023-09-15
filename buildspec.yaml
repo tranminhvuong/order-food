@@ -10,19 +10,20 @@ phases:
   install:
     on-failure: ABORT
     runtime-versions:
-      nodejs: 14.21
+      nodejs: 16
     commands:
       - yarn
   pre_build:
     on-failure: ABORT
     commands:
-      - aws s3 cp $BUCKET_URI/.env .
+      - echo VITE_API_URL=$BACKEND_API_URL > .env
+      - echo VITE_KEY_API=AIzaSyCswOitF1U7DytAmFm6MYt-EE9DO-cOT2o >> .env
   build:
     on-failure: ABORT
     commands:
       - yarn run build
-artifacts:
-  files:
-    - dist/**/*
-  name: artifact
-  base-directory: dist
+  post_build:
+    on-failure: ABORT
+    commands:
+      - aws s3 cp dist/ $S3_BUCKET_DESTINATION_URI --recursive
+      - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
