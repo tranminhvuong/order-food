@@ -4,4 +4,4 @@ Title: Release v0.0.1
 Body: The firts release
 
 # Git_Push
-Commit: 初回登録
+Commit: Rebase
