@@ -6,49 +6,93 @@ on:
       - ppr
       - prd
       - develop
-env:
-  MESSAGE:
-  TAG:
 
 jobs:
-  sync-git:
-    # runs-on: self-hosted
-    runs-on: ubuntu-latest
+  build:
+    name: Create Release
+    runs-on: self-hosted
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
         with:
           ref: ${{ github.ref_name }}
           persist-credentials: false
           fetch-depth: 0
-    
-      - name: Change git repo
-        run: |
-          sudo apt-get install gawk -y
-          MESSAGE=$(awk 'gsub(/Message:/, ""); NR==0' customer_commit.txt)
-          TAG=$(awk 'gsub(/Tag:/, ""); NR==0' customer_commit.txt)
-          echo "TAG=$TAG" >> $GITHUB_ENV
-          rm -rf .git
-          git init
-          git config user.email "${{ vars.SYNC_MAIL }}"
-          git config user.name "${{ vars.SYNC_USER }}"
-          git checkout -b devops
-          git remote add -f origin https://${{ secrets.SYNC_TOKEN }}@github.com/${{ vars.SYNC_REPO }}
-          git fetch
-          git checkout -f origin/${{ github.ref_name }} || echo "No branch"
-          git checkout ${{ github.ref_name }}
-          echo "Debug 1"
-          rm -rf .github azure-pipelines.yml customer_commit.txt
-          git pull origin ${{ github.ref_name }} 
-          echo "Debug 2"
-          git add .
-          git status
-          echo $MESSAGE
-          git commit -m "${MESSAGE}"
-          git branch -d devops
-          git push origin ${{ github.ref_name }} -f
 
-      - name: Push tag
-        if: env.TAG != ''
+      - name: Get variable
+        id: get_var
         run: |
-          git tag $TAG && git push origin $TAG || echo "tag $TAG already exists"
+          TAG_VER=$(cat customer_commit.txt.txt |grep -w Version |awk -F": " '{print $2}')
+          TAG_TITLE=$(cat customer_commit.txt.txt | grep -w Title |awk -F": " '{print $2}')
+          TAG_BODY=$(cat customer_commit.txt.txt | grep -w Body |awk -F": " '{print $2}')
+          MAIL=$(cat customer_commit.txt.txt | grep -w Email |awk -F": " '{print $2}')
+          USER=$(cat customer_commit.txt.txt | grep -w User |awk -F": " '{print $2}')
+          MESSAGE=$(cat customer_commit.txt.txt | grep -w Commit |awk -F": " '{print $2}')
+          echo ::set-output name=TAG_VER::$TAG_VER
+          echo ::set-output name=TAG_TITLE::$TAG_TITLE
+          echo ::set-output name=TAG_BODY::$TAG_BODY
+          echo ::set-output name=MAIL::$MAIL
+          echo ::set-output name=USER::$USER
+          echo ::set-output name=MESSAGE::$MESSAGE
+
+      - name: Change commit "初回登録"
+        env:
+          MESS: ${{ steps.get_var.outputs.MESSAGE }}
+        if: ${{ env.MESS == '初回登録' }}
+        run: |
+          git config user.email "${{ steps.get_var.outputs.MAIL }}"
+          git config user.name "${{ steps.get_var.outputs.USER }}"
+          git checkout --orphan temp
+          rm -rf .github* azure-pipelines.yml customer_commit.txt
+          git rm --cached .github* azure-pipelines.yml customer_commit.txt
+          git add -A
+          git commit -am "初回登録"
+          git branch -D ${{ github.ref_name }}
+          git branch -m ${{ github.ref_name }}
+          git tag ${{ steps.get_var.outputs.TAG_VER }}
+          git remote remove origin
+          git remote add origin https://${{ secrets.SYNC_TOKEN }}@github.com/${{ vars.SYNC_REPO }}
+          git push origin ${{ github.ref_name }} -f
+          git push origin ${{ steps.get_var.outputs.TAG_VER }}
+
+      - name: Change commit another
+        env:
+          MESS: ${{ steps.get_var.outputs.MESSAGE }}
+        if: ${{ env.MESS != '初回登録' }}
+        run: |
+          HASH_COMM=`git log --oneline |grep 初回登録 |head -1 |awk {'print $1'}`
+          COMMIT_DATE=`git log --oneline --pretty=fuller --format=%aD-%h |grep $HASH_COMM |head -1|cut -d- -f1`
+          echo "---$HASH_COMM-----$COMMIT_DATE---"
+          git config user.email "${{ steps.get_var.outputs.MAIL }}"
+          git config user.name "${{ steps.get_var.outputs.USER }}"
+          git checkout -b oldbranch $HASH_COMM
+          rm -rf .github* azure-pipelines.yml customer_commit.txt
+          git rm --cached .github* azure-pipelines.yml customer_commit.txt
+          TREE=`git write-tree`
+          COMMIT=`echo "初回登録" | git commit-tree "$TREE"`
+          git checkout -b newbranch "$COMMIT"
+          GIT_COMMITTER_DATE="$COMMIT_DATE" git commit --amend --no-edit --date "$COMMIT_DATE"
+          git rebase --committer-date-is-author-date --onto newbranch oldbranch ${{ github.ref_name }}
+          git branch -D newbranch oldbranch
+          git gc
+          echo "--------- filter-repo -----------------"
+          git filter-repo -f --name-callback 'return b"Tokairika"' --email-callback 'return b"syuya.maegawa@exc.tokai-rika.co.jp"'
+          git tag ${{ steps.get_var.outputs.TAG_VER }}
+          git log
+          git --version
+          git remote add neworigin https://${{ secrets.SYNC_TOKEN }}@github.com/${{ vars.SYNC_REPO }}
+          git push neworigin ${{ github.ref_name }} -f
+          git push neworigin ${{ steps.get_var.outputs.TAG_VER }}
+    
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_var.outputs.TAG_VER }}
+          release_name: ${{ steps.get_var.outputs.TAG_TITLE }}
+          body: |
+            ${{ steps.get_var.outputs.TAG_BODY }}
+          draft: false
+          prerelease: false
