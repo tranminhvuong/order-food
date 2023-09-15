@@ -1,2 +1,9 @@
-Message:Commit 4
-Tag:v0.0.1
+# Tag_Release
+Version: v0.0.1
+Title: Release v0.0.1
+Body: The firts release
+
+# Git_Push
+Email: vuong.tran11.dn@gmail.com
+User: Tokairika
+Commit: 初回登録
