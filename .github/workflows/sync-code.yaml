@@ -43,8 +43,8 @@ jobs:
           git config user.email "${{ vars.SYNC_MAIL }}"
           git config user.name "${{ vars.SYNC_USER }}"
           git checkout --orphan temp
-          rm -rf .github* azure-pipelines.yml customer_commit.txt
-          git rm --cached .github* azure-pipelines.yml customer_commit.txt
+          rm -rf .github* azure-pipelines.yml
+          git rm --cached .github* azure-pipelines.yml
           git add -A
           git commit -am "初回登録"
           git branch -D ${{ github.ref_name }}
@@ -66,8 +66,8 @@ jobs:
           git config user.email "${{ vars.SYNC_MAIL }}"
           git config user.name "${{ vars.SYNC_USER }}"
           git checkout -b oldbranch $HASH_COMM
-          rm -rf .github* azure-pipelines.yml customer_commit.txt
-          git rm --cached .github* azure-pipelines.yml customer_commit.txt
+          rm -rf .github* azure-pipelines.yml
+          git rm --cached .github* azure-pipelines.yml
           TREE=`git write-tree`
           COMMIT=`echo "初回登録" | git commit-tree "$TREE"`
           git checkout -b newbranch "$COMMIT"
